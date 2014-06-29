@@ -1,0 +1,11 @@
+{
+  "name": "midiclock",
+  "version": "0.0.1",
+  "description": "MIDI clock emitter",
+  "main": "midiclock.js",
+  "scripts": {
+    "test": "grunt test"
+  },
+  "author": "Mike Dominice <mike@mikedominice.com>",
+  "license": "MIT"
+}
