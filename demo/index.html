@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>MIDI Clock Generator Demo</title>
+    </head>
+    <body>
+        <h1>MIDI Clock Generator Demo</h1>
+        <input type="number" min="80" max="200" id="tempo" value="120">
+        <button id="send" type="button">Send</button>
+        <script src="../midiclock.js"></script>
+        <script>
+            (function (document, MIDIClock) {
+                var button = document.getElementById('send'),
+                    tempoInput = document.getElementById('tempo'),
+                    clock = new MIDIClock();
+                clock.onmidimessage = function (event) {
+                    console.log(event.toString());
+                }
+
+                function setTempo() {
+                    clock.tempo = tempoInput.value;
+                }
+
+                function sendClock() {
+                    button.disabled = true;
+                    clock.send(function () {
+                        button.disabled = false;
+                    });
+                } 
+
+                tempoInput.addEventListener('change', setTempo, false);
+                button.addEventListener('click', sendClock, false);
+            }(this.document, this.MIDIClock));
+        </script>
+    </body>
+</html>
