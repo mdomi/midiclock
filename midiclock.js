@@ -1,3 +1,8 @@
+/**
+ * midiclock.js
+ * (c) 2014 Michael Dominice
+ * midiclock.js is freely distributable under the MIT license.
+ */
 this.MIDIClock = (function (window) {
     'use strict';
 
@@ -12,8 +17,7 @@ this.MIDIClock = (function (window) {
     function MIDIClockMessage() {
         // TODO: how to determine the timestamp
         this.timestamp = window.performance.timing.navigationStart + window.performance.now();
-        this.data = new Uint8Array(1);
-        this.data[0] = CLOCK_STATUS;
+        this.data = new Uint8Array([CLOCK_STATUS]);
     }
 
     MIDIClockMessage.prototype.toString = function () {
