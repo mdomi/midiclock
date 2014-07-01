@@ -10,10 +10,6 @@ this.MIDIClock = (function (window) {
         CLOCKS_PER_BEAT = 24,
         CLOCK_STATUS = 0xf8;
 
-    function MIDIClock(tempo) {
-        this.tempo = tempo || 120;
-    }
-
     function MIDIClockMessage() {
         // TODO: how to determine the timestamp
         this.timestamp = window.performance.timing.navigationStart + window.performance.now();
@@ -27,30 +23,33 @@ this.MIDIClock = (function (window) {
         ].join(',') + ']';
     };
 
-    function send(clock, handler, callback) {
-        var clocksPerMinute = clock.tempo * CLOCKS_PER_BEAT,
-            clockDuration = MS_PER_MINUTE / clocksPerMinute,
-            clocksSent = 0;
-        clearInterval(clock.interval);
-        clock.interval = setInterval(function () {
-            if (clocksSent < CLOCKS_PER_BEAT) {
-                handler(new MIDIClockMessage());
-                clocksSent = clocksSent + 1;
-            } else {
-                clearInterval(clock.interval);
-                if (typeof callback === 'function') {
-                    callback();
-                }
-            }
-        }.bind(clock), clockDuration);
+    function MIDIClock(tempo) {
+        this.tempo = tempo || 120;
+        this._execute = this._execute.bind(this);
     }
 
-    MIDIClock.prototype.send = function (callback) {
-        if (typeof this.onmidimessage === 'function') {
-            // don't send if there's no one listening
-            send(this, this.onmidimessage, callback);
-        }
+    MIDIClock.prototype.start = function () {
+        clearTimeout(this._timeout);
+        this._timeout = setTimeout(this._execute, this.getClockDuration());
     };
+
+    MIDIClock.prototype.stop = function () {
+        clearTimeout(this._timeout);
+    };
+
+    MIDIClock.prototype.getClockDuration = function () {
+        var clocksPerMinute = this.tempo * CLOCKS_PER_BEAT;
+        return MS_PER_MINUTE / clocksPerMinute;
+    };
+
+    MIDIClock.prototype._execute = function () {
+        if (typeof this.onmidimessage === 'function') {
+            this.onmidimessage(new MIDIClockMessage());
+        }
+        this._timeout = setTimeout(this._execute, this.getClockDuration());
+    };
+
+    MIDIClock.CLOCKS_PER_BEAT = CLOCKS_PER_BEAT;
 
     return MIDIClock;
 

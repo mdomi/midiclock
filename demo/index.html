@@ -6,76 +6,9 @@
     <body>
         <h1>MIDI Clock Generator Demo</h1>
         <p id="status"></p>
-        <input type="number" min="80" max="200" id="tempo" value="120">
-        <button id="send" type="button">Send</button>
+        <input type="number" min="45" max="180" id="tempo" value="120">
+        <button id="send" type="button">Start</button>
         <script src="../midiclock.js"></script>
-        <script>
-            (function (navigator, document, MIDIClock) {
-                var button = document.getElementById('send'),
-                    tempoInput = document.getElementById('tempo'),
-                    clock = new MIDIClock(),
-                    controls = [button];
-
-                clock.onmidimessage = function (event) {
-                    console.log(event.toString());
-                }
-
-                function setControlDisabledStatus(disabled) {
-                    controls.forEach(function (control) {
-                        control.disabled = disabled;
-                    })
-                }
-
-                function setTempo() {
-                    clock.tempo = tempoInput.value;
-                }
-
-                function sendClock() {
-                    setControlDisabledStatus(true)
-                    clock.send(function () {
-                        setControlDisabledStatus(false);
-                    });
-                }
-
-                tempoInput.addEventListener('change', setTempo, false);
-                button.addEventListener('click', sendClock, false);
-
-                function createOption(label) {
-                    var option = document.createElement('option');
-                    option.innerHTML = label;
-                    return option;
-                }
-
-                if (typeof navigator.requestMIDIAccess === 'function') {
-                    navigator.requestMIDIAccess().then(function (midi) {
-                        var outputs = {'-' : null},
-                            chooser = document.createElement('select'),
-                            output = outputs['-'];
-                        chooser.appendChild(createOption('-'));
-                        midi.outputs().forEach(function (output) {
-                            outputs[output.name] = output;
-                            chooser.appendChild(createOption(output.name));
-                        });
-                        document.body.appendChild(chooser);
-                        chooser.addEventListener('change', function () {
-                            output = outputs[this.value];
-                        });
-                        controls.push(chooser);
-                        clock.onmidimessage = function (event) {
-                            if (output) {
-                                output.send(event.data);
-                            } else {
-                                console.log(event.toString());
-                            }
-                        };
-                    }, function (error) {
-                        console.log('Error');
-                        document.getElementById('status').innerHTML = 'Error attempting to access MIDI.';
-                    });
-                } else {
-                    document.getElementById('status').innerHTML = 'Your browser does not support MIDI access.';
-                }
-            }(this.navigator, this.document, this.MIDIClock));
-        </script>
+        <script src="demo.js"></script>
     </body>
 </html>
